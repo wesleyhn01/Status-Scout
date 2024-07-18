@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Scout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica:wght@400;700&display=swap');
+        
+        body, input, select, button {
+            font-family: 'Helvetica', Arial, sans-serif;
+        }
+        
+        h1 {
+            font-family: 'Helvetica', Arial, sans-serif;
+            font-weight: 700;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .animated-bg {
+            background: linear-gradient(-45deg, #000000, #434343, #565656, #2c2c2c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        .scouting-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .scouting-animation::before {
+            content: "";
+            position: absolute;
+            top: -200px;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.05) 0,
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 50%
+            );
+            animation: moveBackground 15s linear infinite;
+        }
+        @keyframes moveBackground {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, -50%, 0); }
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .title-animation {
+            opacity: 0;
+            animation: titleAppear 1s ease-out forwards;
+        }
+        @keyframes titleAppear {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .form-animation {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: formAppear 1s ease-out 0.5s forwards;
+        }
+        @keyframes formAppear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .hidden {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8rem;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            position: absolute;
+            pointer-events: none;
+            color: #ffffff;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            text-align-last: center;
+            padding-right: 30px;
+        }
+        select::-ms-expand {
+            display: none;
+        }
+        select option {
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="scouting-animation"></div>
+    <div class="container max-w-md mx-auto text-center relative">
+        <h1 id="title" class="text-6xl mb-8 text-white drop-shadow-lg title-animation">Status Scout</h1>
+        <form id="searchForm" class="glass-effect p-8 rounded-3xl shadow-2xl space-y-6 form-animation">
+            <div class="flex flex-col items-center">
+                <label for="searchType" class="block text-xl font-normal text-white mb-2">Search Type:</label>
+                <div class="select-wrapper w-full">
+                    <select id="searchType" name="search_type" required class="w-full px-4 py-3 rounded-full text-center bg-gray-700 bg-opacity-50 border-2 border-gray-500 focus:ring-2 focus:ring-gray-300 focus:border-transparent transition duration-200 text-lg text-white">
+                        <option value="">Select search type</option>
+                        <option value="1">Handshake</option>
+                        <option value="2">LinkedIn</option>
+                        <option value="3">Free-Search</option>
+                    </select>
+                </div>
+            </div>
+            <div id="linkedinOptions" class="flex flex-col items-center hidden">
+                <label for="linkedinType" class="block text-xl font-normal text-white mb-2">LinkedIn Classification:</label>
+                <div class="select-wrapper w-full">
+                    <select id="linkedinType" name="linkedin_type" class="w-full px-4 py-3 rounded-full text-center bg-gray-700 bg-opacity-50 border-2 border-gray-500 focus:ring-2 focus:ring-gray-300 focus:border-transparent transition duration-200 text-lg text-white">
+                        <option value="1">Applied</option>
+                        <option value="2">Viewed</option>
+                        <option value="3">Deferred</option>
+                    </select>
+                </div>
+            </div>
+            <div id="keywordsInput" class="flex flex-col items-center hidden">
+                <label for="keywords" class="block text-xl font-normal text-white mb-2">Keywords:</label>
+                <input type="text" id="keywords" name="keywords" placeholder="Enter keywords" class="w-full px-4 py-3 rounded-full text-center bg-gray-700 bg-opacity-50 border-2 border-gray-500 focus:ring-2 focus:ring-gray-300 focus:border-transparent transition duration-200 text-lg text-white placeholder-gray-300">
+            </div>
+            <div id="sheetLinkInput" class="flex flex-col items-center hidden">
+                <label for="sheetLink" class="block text-xl font-normal text-white mb-2">Google Sheet Link:</label>
+                <input type="text" id="sheetLink" name="sheet_link" required placeholder="Paste your link here" class="w-full px-4 py-3 rounded-full text-center bg-gray-700 bg-opacity-50 border-2 border-gray-500 focus:ring-2 focus:ring-gray-300 focus:border-transparent transition duration-200 text-lg text-white placeholder-gray-300">
+            </div>
+            <button type="submit" id="submitButton" class="w-full py-3 px-4 rounded-full text-xl font-normal text-white bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-500 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition duration-200 mt-4 hidden">Run Search</button>
+        </form>
+        <div id="results" class="mt-8"></div>
+        <div id="downloadButtons" class="mt-4 space-x-4 hidden">
+            <a href="/download/db" class="inline-block px-6 py-2 rounded-full text-white bg-gray-700 hover:bg-gray-800 transition duration-200">Download DB</a>
+            <a href="/download/txt" class="inline-block px-6 py-2 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition duration-200">Download TXT</a>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript remains unchanged
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchType = document.getElementById('searchType');
+            const linkedinOptions = document.getElementById('linkedinOptions');
+            const keywordsInput = document.getElementById('keywordsInput');
+            const sheetLinkInput = document.getElementById('sheetLinkInput');
+            const submitButton = document.getElementById('submitButton');
+            const results = document.getElementById('results');
+            const downloadButtons = document.getElementById('downloadButtons');
+
+            // Form step animations
+            searchType.addEventListener('change', function() {
+                linkedinOptions.classList.add('hidden');
+                keywordsInput.classList.add('hidden');
+                sheetLinkInput.classList.add('hidden');
+                submitButton.classList.add('hidden');
+
+                if (this.value === '2') {
+                    showElement(linkedinOptions);
+                } else if (this.value === '3') {
+                    showElement(keywordsInput);
+                }
+
+                if (this.value) {
+                    showElement(sheetLinkInput);
+                }
+            });
+
+            sheetLinkInput.querySelector('input').addEventListener('input', function() {
+                if (this.value) {
+                    showElement(submitButton);
+                } else {
+                    submitButton.classList.add('hidden');
+                }
+            });
+
+            function showElement(element) {
+                element.classList.remove('hidden');
+                element.classList.add('fade-in');
+            }
+
+            // Form submission
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitButton.textContent = 'Processing...';
+                submitButton.disabled = true;
+
+                // Simulating API call
+                setTimeout(() => {
+                    results.innerHTML = '<div class="glass-effect rounded-2xl p-4 text-white text-xl fade-in">Search completed successfully!</div>';
+                    downloadButtons.classList.remove('hidden');
+                    downloadButtons.classList.add('fade-in');
+                    submitButton.textContent = 'Run Search';
+                    submitButton.disabled = false;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
